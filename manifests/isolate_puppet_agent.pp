@@ -52,11 +52,16 @@ class peadm_bootstrap::isolate_puppet_agent (
     content => epp('peadm_bootstrap/peadm.puppet.service.epp', {
         'peadm_puppet_agent_bin_dir' => '/opt/puppetlabs/puppet/bin/',
     'peadm_puppet_agent_conf_dir'    => $peadm_puppet_agent_conf_dir }),
-    notify  => Exec['refresh_systemctl_daemon'],
+    notify  => Exec['refresh_systemctl_daemon_puppet'],
   }
 
   service { $peadm_puppet_agent_service:
     ensure => running,
     enable => true,
+  }
+
+  exec { 'refresh_systemctl_daemon_puppet':
+    command     => '/usr/bin/systemctl daemon-reload',
+    refreshonly => true,
   }
 }
