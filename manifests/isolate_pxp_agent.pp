@@ -16,12 +16,16 @@ class peadm_bootstrap::isolate_pxp_agent (
   $peadm_pxp_agent_service = 'peadm.pxp.service'
   $pxp_conf_dir = '/etc/puppetlabs/puppet/'
 
-  file { $peadm_pxp_agent_bin_dir:
-    ensure => directory,
+  if !defined(File[$peadm_pxp_agent_bin_dir]) {
+    file { $peadm_pxp_agent_bin_dir:
+      ensure => directory,
+    }
   }
 
-  file { $peadm_pxp_agent_conf_dir:
-    ensure => directory,
+  if !defined(File[$peadm_pxp_agent_conf_dir]) {
+    file { $peadm_pxp_agent_conf_dir:
+      ensure => directory,
+    }
   }
 
   # Remove to test? not included facter?

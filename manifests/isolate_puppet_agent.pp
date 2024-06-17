@@ -18,12 +18,16 @@ class peadm_bootstrap::isolate_puppet_agent (
   $peadm_puppet_agent_service = 'peadm.puppet.service'
   $puppet_conf_dir = '/etc/puppetlabs/puppet/'
 
-  file { $peadm_puppet_agent_bin_dir:
-    ensure => directory,
+  if !defined(File[$peadm_puppet_agent_bin_dir]) {
+    file { $peadm_puppet_agent_bin_dir:
+      ensure => directory,
+    }
   }
 
-  file { $peadm_puppet_agent_conf_dir:
-    ensure => directory,
+  if !defined(File[$peadm_puppet_agent_conf_dir]) {
+    file { $peadm_puppet_agent_conf_dir:
+      ensure => directory,
+    }
   }
 
   # Remove to test? not included facter?
