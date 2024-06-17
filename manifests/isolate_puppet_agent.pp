@@ -10,13 +10,13 @@
 # @example
 #   include peadm_bootstrap::isolate_puppet_agent
 class peadm_bootstrap::isolate_puppet_agent (
-  String $peadm_puppet_agent_bin_dir = '/opt/peadm/puppet/bin',
+  String $peadm_puppet_agent_bin_dir = '/opt/peadm/puppet/bin/',
   String $peadm_puppet_agent_conf_dir = '/etc/peadm/puppet/',
 ) {
   $puppet_agent_bin = '/opt/puppetlabs/puppet/bin/puppet'
   $puppet_agent_conf = '/etc/puppetlabs/puppet/puppet.conf'
   $peadm_puppet_agent_service = 'peadm.puppet.service'
-  $puppet_ssl_dir = '/etc/puppetlabs/puppet/ssl'
+  $puppet_conf_dir = '/etc/puppetlabs/puppet/'
 
   file { $peadm_puppet_agent_bin_dir:
     ensure => directory,
@@ -26,25 +26,29 @@ class peadm_bootstrap::isolate_puppet_agent (
     ensure => directory,
   }
 
-  exec { 'copy puppet agent binary':
-    command => "cp ${puppet_agent_bin} ${peadm_puppet_agent_bin_dir}/puppet",
-    onlyif  => "test -e ${puppet_agent_bin}",
-    unless  => "test -e ${peadm_puppet_agent_bin_dir}/puppet",
-    require => File[$peadm_puppet_agent_bin_dir],
-  }
+  # Remove to test? not included facter?
+  # exec { 'copy puppet agent binary':
+  #   command => "cp ${puppet_agent_bin} ${peadm_puppet_agent_bin_dir}/puppet",
+  #   onlyif  => "test -e ${puppet_agent_bin}",
+  #   unless  => "test -e ${peadm_puppet_agent_bin_dir}/puppet",
+  #   require => File[$peadm_puppet_agent_bin_dir],
+  # }
 
   exec { 'copy puppet directory':
-    command => "cp -r ${puppet_ssl_dir} ${peadm_puppet_agent_conf_dir}",
-    onlyif  => "test -e ${puppet_ssl_dir}",
+    command => "cp -r ${puppet_conf_dir} ${peadm_puppet_agent_conf_dir}",
+    onlyif  => "test -e ${puppet_conf_dir}",
     unless  => "test -e ${peadm_puppet_agent_conf_dir}",
     require => File[$peadm_puppet_agent_conf_dir],
   }
 
-  file { "/etc/systemd/system/${peadm_puppet_agent_service}":
+  file { "/usr/lib/systemd/system/${peadm_puppet_agent_service}":
     ensure  => file,
     owner   => 'root',
     group   => 'root',
-    content => template('peadm_bootstrap/peadm.puppet.service.epp'),
+    content => epp('peadm_bootstrap/peadm.puppet.service.epp', {
+        'peadm_puppet_agent_bin_dir' => '/opt/puppetlabs/puppet/bin/',
+    'peadm_puppet_agent_conf_dir'    => $peadm_puppet_agent_conf_dir }),
+    notify  => Exec['peadm_boostrap::refresh_systectl_daemon'],
   }
 
   service { $peadm_puppet_agent_service:

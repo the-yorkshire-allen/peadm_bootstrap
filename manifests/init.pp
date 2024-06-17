@@ -5,4 +5,8 @@
 # @example
 #   include peadm_bootstrap
 class peadm_bootstrap {
+  exec { 'refresh systectl daemon':
+    command     => '/usr/bin/systemctl daemon-reload',
+    refreshonly => true,
+  }
 }

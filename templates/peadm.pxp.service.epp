@@ -1,0 +1,25 @@
+<%- | String $peadm_pxp_agent_bin_dir,
+      String $peadm_pxp_agent_conf_dir
+| -%>
+#
+# Local settings can be configured without being overwritten by package upgrades, for example
+# if you want to increase pxp-agent open-files-limit to 10000,
+# you need to increase systemd's LimitNOFILE setting, so create a file named
+# "/etc/systemd/system/pxp-agent.service.d/limits.conf" containing:
+# [Service]
+# LimitNOFILE=10000
+# You can confirm it worked by running systemctl daemon-reload
+# then running systemctl show pxp-agent | grep LimitNOFILE
+#
+[Unit]
+Description=PCP Execution Protocol (PXP) Agent Isolated
+After=syslog.target network.target
+
+[Service]
+EnvironmentFile=-/etc/sysconfig/pxp-agent-isolated
+EnvironmentFile=-/etc/default/pxp-agent-isolated
+ExecStart=<%=$peadm_pxp_agent_bin_dir%>/pxp-agent $PXP_AGENT_OPTIONS --foreground --confdir <%=$peadm_pxp_agent_conf_dir%>
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

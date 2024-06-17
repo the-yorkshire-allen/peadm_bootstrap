@@ -1,0 +1,29 @@
+<%- | String $peadm_puppet_agent_bin_dir,
+      String $peadm_puppet_agent_conf_dir
+| -%>
+#
+# Local settings can be configured without being overwritten by package upgrades, for example
+# if you want to increase puppet open-files-limit to 10000,
+# you need to increase systemd's LimitNOFILE setting, so create a file named
+# "/etc/systemd/system/puppet.service.d/limits.conf" containing:
+# [Service]
+# LimitNOFILE=10000
+# You can confirm it worked by running systemctl daemon-reload
+# then running systemctl show puppet | grep LimitNOFILE
+#
+[Unit]
+Description=Puppet agent isolated
+Documentation=man:puppet-agent(8)
+Wants=basic.target
+After=basic.target network.target network-online.target
+
+[Service]
+EnvironmentFile=-/etc/sysconfig/puppetagent-isolate
+EnvironmentFile=-/etc/sysconfig/puppet-isolate
+EnvironmentFile=-/etc/default/puppet-isolate
+ExecStart=<%=$peadm_puppet_agent_bin_dir%>puppet agent $PUPPET_EXTRA_OPTS --no-daemonize --confdir <%=$peadm_puppet_agent_conf_dir%>
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
