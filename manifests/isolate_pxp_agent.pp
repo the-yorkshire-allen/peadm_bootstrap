@@ -50,7 +50,7 @@ class peadm_bootstrap::isolate_pxp_agent (
     content => epp('peadm_bootstrap/peadm.pxp.service.epp', {
         'peadm_pxp_agent_bin_dir' => '/opt/puppetlabs/puppet/bin/',
     'peadm_pxp_agent_conf_dir'    => $peadm_pxp_agent_conf_dir }),
-    notify  => Exec['peadm_boostrap::refresh_systectl_daemon'],
+    notify  => Exec['rrefresh_systemctl_daemon'],
   }
 
   service { $peadm_pxp_agent_service:
