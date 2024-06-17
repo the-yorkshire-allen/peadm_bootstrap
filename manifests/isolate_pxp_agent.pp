@@ -36,7 +36,7 @@ class peadm_bootstrap::isolate_pxp_agent (
   #   require => File[$peadm_puppet_agent_bin_dir],
   # }
 
-  exec { 'copy puppet directory':
+  exec { 'copy puppet directory pxp agent':
     command => "cp -r ${pxp_conf_dir} ${peadm_pxp_agent_conf_dir}",
     onlyif  => "test -e ${pxp_conf_dir}",
     unless  => "test -e ${peadm_pxp_agent_conf_dir}",
